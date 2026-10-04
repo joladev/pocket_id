@@ -1,0 +1,24 @@
+{
+    servers {
+        trusted_proxies static 10.0.1.0/24
+        trusted_proxies_strict
+    }
+}
+
+http://{$FIRST_DOMAIN}:8080 {
+    handle /oauth2/* {
+        reverse_proxy oauth2-proxy:4180 {
+            header_up X-Real-IP {client_ip}
+            header_up X-Forwarded-Uri {uri}
+        }
+    }
+
+    handle {
+        forward_auth oauth2-proxy:4180 {
+            uri /
+            header_up X-Real-IP {client_ip}
+        }
+
+        reverse_proxy {$FIRST_UPSTREAM}
+    }
+}
