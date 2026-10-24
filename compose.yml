@@ -6,6 +6,8 @@ services:
       - APP_URL=${APP_URL}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - TRUST_PROXY=${TRUST_PROXY}
+      - OTEL_METRICS_EXPORTER=prometheus
+      - OTEL_EXPORTER_PROMETHEUS_HOST=0.0.0.0
     volumes:
       - pocket-id-data:/app/data
     healthcheck:
@@ -14,6 +16,14 @@ services:
       timeout: 5s
       retries: 2
       start_period: 10s
+    labels:
+      observability.enable: "true"
+      observability.service: "pocket-id"
+      observability.metrics.port: "9464"
+      observability.metrics.path: "/metrics"
+    networks:
+      - default
+      - dokploy-network
 
   caddy:
     image: caddy:2.11.7
@@ -24,6 +34,14 @@ services:
     volumes:
       - ./config:/etc/caddy:ro
       - caddy-data:/data
+    labels:
+      observability.enable: "true"
+      observability.service: "pocket-id-caddy"
+      observability.metrics.port: "9090"
+      observability.metrics.path: "/metrics"
+    networks:
+      - default
+      - dokploy-network
 
   oauth2-proxy:
     image: quay.io/oauth2-proxy/oauth2-proxy:v7.15.5
@@ -42,7 +60,21 @@ services:
       - OAUTH2_PROXY_UPSTREAMS=static://202
       - OAUTH2_PROXY_EMAIL_DOMAINS=*
       - OAUTH2_PROXY_SKIP_PROVIDER_BUTTON=true
+      - OAUTH2_PROXY_METRICS_ADDRESS=0.0.0.0:44180
+    labels:
+      observability.enable: "true"
+      observability.service: "pocket-id-oauth2-proxy"
+      observability.metrics.port: "44180"
+      observability.metrics.path: "/metrics"
+    networks:
+      - default
+      - dokploy-network
 
 volumes:
   pocket-id-data:
   caddy-data:
+
+networks:
+  default: {}
+  dokploy-network:
+    external: true

@@ -1,4 +1,6 @@
 {
+    metrics
+
     servers {
         trusted_proxies static 10.0.1.0/24
         trusted_proxies_strict
@@ -21,4 +23,8 @@ http://{$FIRST_DOMAIN}:8080 {
 
         reverse_proxy {$FIRST_UPSTREAM}
     }
+}
+
+http://:9090 {
+    metrics /metrics
 }
