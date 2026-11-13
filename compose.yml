@@ -1,6 +1,6 @@
 services:
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:v2.19.1
+    image: ghcr.io/pocket-id/pocket-id:v2.19.2
     restart: unless-stopped
     environment:
       - APP_URL=${APP_URL}
@@ -26,7 +26,7 @@ services:
       - dokploy-network
 
   caddy:
-    image: caddy:2.11.7
+    image: caddy:2.11.9
     restart: unless-stopped
     environment:
       - FIRST_DOMAIN=${FIRST_DOMAIN}
@@ -44,7 +44,7 @@ services:
       - dokploy-network
 
   oauth2-proxy:
-    image: quay.io/oauth2-proxy/oauth2-proxy:v7.15.5
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.15.6
     restart: unless-stopped
     environment:
       - OAUTH2_PROXY_PROVIDER=oidc
